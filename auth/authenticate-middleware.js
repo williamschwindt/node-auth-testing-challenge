@@ -7,14 +7,16 @@ function authenticate(id) {
     }
 
     try {
-      const token = req.cookie.token
+      const token = req.cookies.token
       if(!token) {
         return res.status(401).json(authErr)
       }
 
       jwt.verify(token, 'supersecretsecret', (err, decodedPayload) => {
         if(err || decodedPayload.userId !== id) {
-          return res.status(401).json(authErr)
+          return res.status(401).json({
+            message: 'invalid credentials'
+          })
         }
 
         req.token = decodedPayload

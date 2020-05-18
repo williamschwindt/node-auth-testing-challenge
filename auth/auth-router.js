@@ -5,6 +5,13 @@ const db = require('../database/dbConfig')
 
 router.post('/register', (req, res, next) => {
   const credentials = req.body
+
+  if(!credentials.username || !credentials.password) {
+    return res.status(400).json({
+      message: 'must have username and password'
+    })
+  }
+
   const hashedPassword = bcrypt.hashSync(credentials.password, 12)
 
   credentials.password = hashedPassword
@@ -22,6 +29,12 @@ router.post('/register', (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
+  if(!req.body.username || !req.body.password) {
+    return res.status(400).json({
+      message: 'must have username and password'
+    })
+  }
+
   const authErr = {
     message: 'invalid credentials'
   }
@@ -34,7 +47,7 @@ router.post('/login', async (req, res, next) => {
 
     const passwordValid = await bcrypt.compare(req.body.password, user.password)
     if(!passwordValid) {
-      return res.status(404).json(authErr)
+      return res.status(401).json(authErr)
     }
 
     const tokenPayload = {
